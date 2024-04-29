@@ -29,6 +29,7 @@ def parseSourcesArray(arr):
     out = out[1:len(out)-1]
     return out
 
+
 business = getSourceIDs("business")
 technology = getSourceIDs("technology") 
 sources = business + technology
@@ -47,10 +48,28 @@ def getArticles(company):
         "language":"en",
         "sort":"publishedAt"
     }
+    
+    
+    articles = []
+    page = 1
 
-    response = requests.get(url,params)
-    print("totalResults: "+ str(response.json().get("totalResults")))
-    return(response.json().get("articles"))
+    while True:
+        print("fetching page: " + str(page))
+        params["page"] = str(page)
+        response = requests.get(url,params)
+        totalResults = response.json().get("totalResults")
+        pageArticles = response.json().get("articles")
+        # if len of page articles = 100 request again
+        print("totalResults: "+ str(totalResults))
+        print("Articles on page: "+ str(len(pageArticles)))
+        
+        for article in response.json().get("articles"):
+            articles.append(article)
+            
+        
+        if len(pageArticles) < 100:
+            break
 
-
-getArticles("micron")
+        page = page + 1
+    
+    return articles
